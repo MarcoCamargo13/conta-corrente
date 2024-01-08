@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import br.com.marcopc.contacorrente.entities.Conta;
 import br.com.marcopc.contacorrente.entities.Cpf;
@@ -52,33 +53,43 @@ public class UserController {
 	@PostMapping("/transferencia")
 	public String realizarTransferencia(@RequestParam(value = "_contaOrigemId", required = true) Long contaOrigemId,
 			@RequestParam(value = "_contaDestinoId", required = true) Long contaDestinoId,
-			@RequestParam(value = "_valor", required = true) Float valor) {
+			@RequestParam(value = "_valor", required = true) String valor) {
 
-		Conta contaOrigem = contaRepository.findById(contaOrigemId).orElse(null);
-		Conta contaDestino = contaRepository.findById(contaDestinoId).orElse(null);
+		try {
 
-		if (contaOrigem == null || contaDestino == null) {
-			return "Contas não encontradas";
+			Float valorTransferencia = Float.parseFloat(valor);
+
+			Conta contaOrigem = contaRepository.findById(contaOrigemId).orElse(null);
+			Conta contaDestino = contaRepository.findById(contaDestinoId).orElse(null);
+
+			if (contaOrigem == null || contaDestino == null) {
+				return "Contas não encontradas";
+			}
+
+			if (valorTransferencia <= 0) {
+				return "O valor da transferência deve ser positivo";
+			}
+
+			if (valorTransferencia > contaOrigem.getSaldo()) {
+				return "Saldo insuficiente para realizar a transferência";
+			}
+
+			// Realiza a transferência
+			contaOrigem.setSaldo(contaOrigem.getSaldo() - valorTransferencia);
+			contaDestino.setSaldo(contaDestino.getSaldo() + valorTransferencia);
+
+			// Atualiza as contas no banco de dados
+			contaRepository.save(contaOrigem);
+			contaRepository.save(contaDestino);
+
+		} catch (MethodArgumentTypeMismatchException e) {
+			return "Erro na chamada da API: Verifique os tipos dos parâmetros";
+
 		}
-
-		if (valor <= 0) {
-			return "O valor da transferência deve ser positivo";
-		}
-
-		if (contaOrigem.getSaldo() < valor) {
-			return "Saldo insuficiente para realizar a transferência";
-		}
-
-		// Realiza a transferência
-		contaOrigem.setSaldo(contaOrigem.getSaldo() - valor);
-		contaDestino.setSaldo(contaDestino.getSaldo() + valor);
-
-		// Atualiza as contas no banco de dados
-		contaRepository.save(contaOrigem);
-		contaRepository.save(contaDestino);
-
 		return "Transferência realizada com sucesso";
 	}
+
+		
 
 	@PostMapping("/cadastrarUsuario")
 	public String cadastrarUsuario(@RequestParam String nome, @RequestParam String senha, @RequestParam String endereco,

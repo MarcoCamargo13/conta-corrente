@@ -30,6 +30,10 @@ public class Conta {
 	@JoinColumn(name = "user_cpf", referencedColumnName = "cpf") // Corrigido para "user_cpf" e referenciado a coluna "cpf" em User
 	private User user;
 
+	private Conta() {
+
+	}
+
 	public String getNum_conta() {
 		return num_conta;
 	}
@@ -37,12 +41,7 @@ public class Conta {
 	public void setNum_conta(String num_conta) {
 		this.num_conta = num_conta;
 	}
-
-
-	private Conta() {
-
-	}
-
+	
 	public User getUser() {
 		return user;
 	}
