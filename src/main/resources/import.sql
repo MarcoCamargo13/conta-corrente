@@ -1,8 +1,7 @@
-INSERT INTO tb_cpf(cpf) VALUES (123456781);
-INSERT INTO tb_cpf(cpf) VALUES (123456778);
+-- Inserções na tabela tb_client
+INSERT INTO tb_client(name, address, document, status) VALUES ('Maria', 'Rua um, 2', '123456781', 'ATIVA');
+INSERT INTO tb_client(name, address, document, status) VALUES ('Bob', 'Rua dois, 3', '123456778', 'ATIVA');
 
-INSERT INTO tb_user(id,nome, senha, endereco) VALUES (1,'Maria', '132456', 'Rua 1, 2');
-INSERT INTO tb_user(id, nome, senha, endereco) VALUES (2,'Bob', '132456', 'Rua 2, 3');
-
-INSERT INTO tb_conta(user_id, agencia, status, saldo, num_conta) VALUES (1,'1234',true, 2451.22 , '987654');
-INSERT INTO tb_conta(user_id, agencia, status, saldo, num_conta) VALUES (2,'1285',true, 25896.22, '585858');
+-- Inserções na tabela tb_count, associando cada conta a um cliente
+INSERT INTO tb_count(agencia, saldo, num_conta, password, client_id) VALUES ('1234', 5.0, '987654', '132456', 1);
+INSERT INTO tb_count(agencia, saldo, num_conta, password, client_id) VALUES ('1285', 6.0, '585858', '132456', 2);
